@@ -1,0 +1,34 @@
+# 1. Install Java
+sudo apt update && sudo apt install openjdk-21-jdk -y && java -version
+
+# 2. Install Maven
+wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz && sudo tar -xzf apache-maven-3.9.6-bin.tar.gz -C /opt/ && echo 'export PATH=/opt/apache-maven-3.9.6/bin:$PATH' | sudo tee /etc/profile.d/maven.sh && source /etc/profile.d/maven.sh && mvn -version
+
+# 3. Install Jenkins
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null && echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null && sudo apt update && sudo apt install jenkins -y
+
+# 4. Start Jenkins
+sudo systemctl start jenkins && sudo systemctl enable jenkins && sudo systemctl status jenkins
+
+# 5. Get Jenkins Password
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+# 6. Open Jenkins
+http://YOUR_PUBLIC_IP:8080
+
+# 7. Configure Maven in Jenkins
+Manage Jenkins → Plugins → Install “Maven Integration Plugin” → Manage Jenkins → Tools → Add Maven → Name: Maven 3.9.6 → Uncheck Install Automatically → Path: /opt/apache-maven-3.9.6 → Save
+
+# 8. Create Freestyle Job
+New Item → Freestyle Project → Source Code Management → Git → Repo URL:
+https://github.com/bindiyaaj-blr/simple-java-maven-app.git
+Build Steps → Invoke top-level Maven targets → Maven Version: Maven 3.9.6 → Goals: clean install → Save
+
+# 9. Build Project
+Build Now
+
+# 10. Check JAR File
+sudo su - jenkins && cd /var/lib/jenkins/.m2/repository/com/mycompany/app/my-app/1.0-SNAPSHOT/ && ls
+
+# 11. Run JAR
+java -jar my-app-1.0-SNAPSHOT.jar
